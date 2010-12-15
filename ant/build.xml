@@ -1,0 +1,163 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+
+<!--
+    How to use this build file
+    Run default target
+    Important targets begin with an underscore
+-->
+<project basedir=".." default="_master-archive-build" name="build-dragonjsjava">
+
+    <property name="source.src.dir" value="${basedir}/src" />
+    <property name="build.dest.dir" value="${basedir}/build" />
+    <property name="classes.dest.dir" value="${build.dest.dir}/classes" />
+    <property name="jar.dest.dir" value="${build.dest.dir}/jar" />
+    <property name="version" value="1" />
+    <property name="jarname" value="dragonjsjava-${version}.jar" />
+    <property name="jar.file" value="${jar.dest.dir}/${jarname}" />
+    
+    <!--
+        Master build target
+        Archives the current build directory with a timestamp
+        Builds java classes
+        Creates a jar
+    -->
+    <target name="_master-archive-build">
+    
+        <echo>***************************************************************</echo>
+        <echo>About to _master-archive-build</echo>
+        <echo>***************************************************************</echo>
+	
+        <antcall target="_archive-build-dir" />
+        <antcall target="_compile" />
+        <antcall target="_jar" />
+	
+	</target>
+
+
+    <!--
+        Compiles java code
+    -->
+    <target name="_compile">
+	
+        <echo>***************************************************************</echo>
+        <echo>About to compile java classes</echo>
+        <echo>***************************************************************</echo>
+
+	    <!-- Create the build/classes dir -->
+	    <mkdir dir="${classes.dest.dir}"/>
+	    	
+        <!-- Build (javac) everything in /src to /build/classes -->
+        <javac destdir="${classes.dest.dir}"
+                    includeAntRuntime="no"
+                    debug="on"
+                    source="1.6">
+            <src path="${source.src.dir}" />
+        </javac>
+        	
+    </target>
+
+    <!--
+        Jar the resulting built classes.
+        Does not fire if there is no built classes dir
+    -->
+    <target name="_jar" depends="check-classes-dir-exists" if="classes_dir_exists">
+        
+        <echo>***************************************************************</echo>
+        <echo>About to jar</echo>
+        <echo>***************************************************************</echo>
+	
+	    <!-- Archive the jar directory if it exists -->
+	    <antcall target="_archive-jar-file" />
+
+        <!-- Create the build/classes dir -->
+        <mkdir dir="${jar.dest.dir}"/>
+        
+        <!-- Jar the classes -->
+        <jar destfile="${jar.file}" 
+                basedir="${classes.dest.dir}"/>
+    </target>
+
+    <!--
+        Only will fire if the jar file exists
+        Build will continue and skip this target if the jar file does not exist
+        If the file exists but is locked and this target fails to rename it (move),
+            the build will fail.
+    -->
+    <target name="_archive-jar-file" 
+            depends="check-jar-file-exists, set-time" 
+            if="jar_file_exists">
+        
+        <echo>***************************************************************</echo>
+        <echo>About to archive the jar file directory</echo>
+        <echo>***************************************************************</echo>
+
+        <!-- Rename the jar file, include timestamp -->
+        <move file="${jar.dest.dir}" 
+                todir="${jar.dest.dir}_backup_${DSTAMP}-${TSTAMP}"
+                failonerror="true" />
+        <echo message="Done making an archive of the jar directory."/>
+
+    </target>    
+
+    <!--
+        Only will fire if the build directory exists
+        Build will continue and skip this target if the build directory does not exist
+        If the directory exists but is locked and this target fails to rename it (move),
+            the build will fail.
+    -->
+    <target name="_archive-build-dir" 
+            depends="check-build-dir-exists, set-time" 
+            if="build_dir_exists">
+        
+        <echo>***************************************************************</echo>
+        <echo>About to archive the build directory</echo>
+        <echo>***************************************************************</echo>
+
+        <!-- Rename the build directory, include timestamp -->
+        <move file="${build.dest.dir}" 
+                todir="${build.dest.dir}_backup_${DSTAMP}-${TSTAMP}"
+                failonerror="true" />
+        <echo message="Done making an archive of the build directory."/>
+
+    </target>    
+    
+    <!--
+        Check to see if the build destination directory exists. 
+        If it does, set the "build_dir_exists" property to true
+        For archiving existing
+    -->
+    <target name="check-build-dir-exists">
+        <available file="${build.dest.dir}" property="build_dir_exists" type="dir"/>
+    	<echo>    build_dir_exists = ${build_dir_exists}</echo>
+    </target>
+            
+    <!--
+        Check to see if the jar file exists. 
+        If it does, set the "jar_exists" property to true
+        For archiving existing
+    -->
+    <target name="check-jar-file-exists">
+        <available file="${jar.file}" property="jar_file_exists" type="file"/>
+        <echo>    jar_file_exists = ${jar_file_exists}</echo>
+    </target>
+                        
+    <!--
+        Check to see if the classes directory exists. 
+        If it does, set the "classes_dir_exists" property to true
+    -->
+    <target name="check-classes-dir-exists">
+        <available file="${classes.dest.dir}" property="classes_dir_exists" type="dir"/>
+        <echo>    classes_dir_exists = ${classes_dir_exists}</echo>
+    </target>
+    
+    <!--
+        This task sets the DSTAMP and TSTAMP properties to the current date / time
+    -->
+    <target name="set-time" >
+        <echo>***************************************************************</echo>
+        <echo>About to set the time</echo>
+        <echo>***************************************************************</echo>
+        <tstamp />
+    </target>
+
+</project>
