@@ -19,9 +19,10 @@ public class JsObjectEntry {
 	}
 
 	/**
-	 * Returns name : valueJsString (quoted string, number, etc) unquoted
+	 * Returns name (string) : valueJsString (string, number, etc)
+	 * Property name is fed into JsString to have it rendered as a string (with quotes)
 	 */
 	public String getJsObjectEntryString() {
-		return property.name() + " : " + jsValue.generateJsValueString();
+		return (new JsString(property.name()).generateJsValueString()) + " : " + jsValue.generateJsValueString();
 	}
 }

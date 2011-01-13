@@ -5,6 +5,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+/**
+ * Per json.org, a json object is { string : value (, string : value...) }
+ * So basically name / value pairs separated by commas, enclosed by curly braces
+ */
 public class JsObject implements JsValue {
 	
 	private List<JsObjectEntry> jsObjectEntries;
@@ -16,7 +20,9 @@ public class JsObject implements JsValue {
 	public JsObject(JsObjectEntry... jsObjectEntries) {
 		List<JsObjectEntry> jsObjectEntryList = new ArrayList<JsObjectEntry>();
 		for(JsObjectEntry jsObjectEntryIt : jsObjectEntries) {
-			jsObjectEntryList.add(jsObjectEntryIt);
+			if(jsObjectEntryIt != null) {
+				jsObjectEntryList.add(jsObjectEntryIt);
+			}
 		}
 		this.jsObjectEntries = jsObjectEntryList;
 	}
@@ -56,7 +62,7 @@ public class JsObject implements JsValue {
 	}
 	
 	/**
-	 * Takes the input map of ScProperty -> JsValue and translates it into
+	 * Takes the input map of JsProperty -> JsValue and translates it into
 	 *   a list of JsObjectEntries. It adds this list to a new JsObject, then
 	 *   runs the generateJsValueString on that object
 	 */

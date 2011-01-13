@@ -3,6 +3,10 @@ package org.dragonjsjava;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * According to json.org, a json array = [ value (, value...) ]
+ * So basically a collection of values separated by commas, enclosed by square braces
+ */
 public class JsArray implements JsValue {
 	
 	private List<JsValue> values;
@@ -27,6 +31,11 @@ public class JsArray implements JsValue {
 		this.jsValueString = jsValueString;
 	}
 
+	/**
+	 * This method iterates through all values in this array and calls "generateJsValueString" on each,
+	 * separates by commas, and wraps in square braces and returns the string result
+	 * Ex = [ 1, 2, 3, 4, "aString", [ "anestedarrayelement1" ], { anObject : "anObjectvalue" } ] 
+	 */
 	@Override
 	public String generateJsValueString() {
 		
